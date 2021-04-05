@@ -127,3 +127,20 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Pycharm config
+.idea/
+
+#Project
+
+# Default json location
+raw_data/
+
+# Default report file
+prices.csv
+
+# Default zip file
+raw_data.zip
+
+hash.txt
