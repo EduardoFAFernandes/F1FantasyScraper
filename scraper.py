@@ -14,6 +14,8 @@ import schedule
 import pandas as pd
 from argh import arg, dispatch_command
 
+#
+import reporters
 
 # Constants
 DEV = True
@@ -24,7 +26,6 @@ DEFAULT_UNIT_TIME = "minutes"
 DEFAULT_DATA_FOLDER = "raw_data"
 DEFAULT_ZIP = DEFAULT_DATA_FOLDER + ".zip"
 DEFAULT_LOGGING_LEVEL = "INFO"
-
 
 
 # TODO remove global variables
@@ -96,49 +97,12 @@ def request_prices_data():
     set_previous_content_hash(current_content_hash)
 
     content = response.content.decode('UTF-8')
-    # content = "{" + f'"datetime":"{str(datetime.now())}","hash":"{current_content_hash}",{content[1:]}'
+
+    content = "{" + f'"datetime":"{str(datetime.now())}",' \
+                    f'"hash":"{current_content_hash}",' \
+                    f'{content[1:]}'
+
     return content
-
-
-def extract_asset_info(asset):
-    """
-    Extracts relevant information for each asset
-
-    :param asset: asset object to extract information
-    :return: dictionary with the relevant asset information
-    """
-    starting_price = next(filter(lambda price: price["game_period_id"] == 70, asset["season_prices"]))["price"]
-
-    return {
-        "id": int(asset['id']),
-        "name": asset['display_name'],
-        "price": float(asset['price']),
-        "price_delta": float(asset['price']) - float(starting_price),
-        "probability_price_up_percentage": int(asset['current_price_change_info']['probability_price_up_percentage']),
-        "probability_price_down_percentage": int(
-            asset['current_price_change_info']['probability_price_down_percentage']),
-        "current_selection_percentage": int(asset['current_price_change_info']["current_selection_percentage"])
-    }
-
-
-def append_price_report(content, datetime_price_report, report_file):
-    """
-    Extract relevant information from the new file
-
-    :param content: raw prices data content
-    :param datetime_price_report: date of the price report
-    :param report_file: report file used to collect all reports
-    :return: None
-    """
-    data = json.loads(content)
-    assets = [extract_asset_info(asset) for asset in data['players']]
-
-    report = pd.DataFrame(assets) \
-        .set_index("id")
-
-    report["datetime"] = str(datetime_price_report)
-
-    report.to_csv(report_file, mode='a', header=not os.path.isfile(report_file))
 
 
 def fetch_save_prices_data(data_folder, zip_path, report_path):
@@ -151,30 +115,17 @@ def fetch_save_prices_data(data_folder, zip_path, report_path):
     :param report_path:
     :return:
     """
-    now = datetime.now()
 
     content = request_prices_data()
 
     if content is None:
         return
 
-    append_price_report(content, now, report_path)
+    reporters.append_price_report(content, report_file=report_path)
 
-    #generating file name based on time of the request
-    file_sufix = "f1Players"
-    filename = f"{file_sufix}_{now.year:04d}_{now.month:02d}_{now.day:02d}" \
-               f"_{now.hour:02d}_{now.minute:02d}_{now.second:02d}.json"
-    file_path = os.path.join(data_folder, filename)
+    reporters.save_to_local_dir(content, data_folder=data_folder)
 
-    #saving json file
-    with open(file_path, "w") as out:
-        out.write(content)
-
-    # Saving to a zip file
-    with zipfile.ZipFile(zip_path, "a") as myZipFile:
-        myZipFile.write(file_path, os.path.basename(file_path), zipfile.ZIP_DEFLATED)
-
-    # os.remove(filepath)
+    reporters.save_to_local_zip(content, zip_path=zip_path)
 
 
 @arg("--delta-time", "-dt",
