@@ -64,7 +64,7 @@ def set_previous_content_hash(previous_content_hash):
     return _static_previous_content_hash
 
 
-def request_prices_data():
+def request_prices_data(duplicates=False):
     """
     Requests the latest prices from f1 fantasy api
 
@@ -87,7 +87,8 @@ def request_prices_data():
 
     current_content_hash = hashlib.sha256(response.content).hexdigest()
     previous_content_hash = get_previous_content_hash()
-    if previous_content_hash is not None \
+    if not duplicates\
+            and previous_content_hash is not None \
             and previous_content_hash == current_content_hash:
         logging.info("Duplicated content.")
         return None
