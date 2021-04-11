@@ -73,6 +73,42 @@ def append_price_report(content, report_file):
         """
         starting_price = next(filter(lambda price: price["game_period_id"] == 70, asset["season_prices"]))["price"]
 
+
+        INITIAL_PCT = {
+            29 : 5,      # N. Mazepin
+            26 : 15,     # K. Raikkonen
+            4  : 12,     # Mercedes
+            3  : 30,     # McLaren
+            6  : 3,      # Alpine
+            5  : 30,     # Red Bull
+            25 : 26,     # Y. Tsunoda
+            19 : 19,     # S. Vettel
+            23 : 27,     # C. Sainz
+            24 : 42,     # P. Gasly
+            8  : 1,      # Alfa Romeo
+            14 : 50,     # M. Verstappen
+            22 : 27,     # C. Leclerc
+            18 : 11,     # L. Stroll
+            2  : 1,      # Williams
+            20 : 17,     # E. Ocon
+            17 : 39,     # D. Ricciardo
+            16 : 51,     # L. Norris
+            15 : 32,     # S. Perez
+            27 : 8,      # A. Giovinazzi
+            30 : 42,     # G. Russell
+            21 : 14,     # F. Alonso
+            1  : 8,      # Ferrari
+            12 : 29,     # L. Hamilton
+            10 : 1,      # Haas
+            31 : 4,      # N. Latifi
+            28 : 27,     # M. Schumacher
+            9  : 8,      # Aston Martin
+            7  : 6,      # AlphaTauri
+            13 : 13,     # V. Bottas
+         }
+        starting_selection_percentage = INITIAL_PCT[asset['id']]
+
+
         return {
             "id": int(asset['id']),
             "name": asset['display_name'],
@@ -82,7 +118,10 @@ def append_price_report(content, report_file):
                 asset['current_price_change_info']['probability_price_up_percentage']),
             "probability_price_down_percentage": int(
                 asset['current_price_change_info']['probability_price_down_percentage']),
-            "current_selection_percentage": int(asset['current_price_change_info']["current_selection_percentage"])
+            "current_selection_percentage": int(asset['current_price_change_info']["current_selection_percentage"]),
+            "current_selection_percentage_delta": int(
+                asset['current_price_change_info']["current_selection_percentage"]) - starting_selection_percentage
+
         }
 
     data = json.loads(content)
