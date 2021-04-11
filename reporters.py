@@ -27,7 +27,7 @@ def save_to_local_dir(content, data_folder="."):
     :return: returns the file_path of the saved json file
     """
     if not os.path.isdir(data_folder):
-        raise NotADirectoryError()
+        os.mkdir(data_folder)
 
     filename = _gen_filename(content)
 
