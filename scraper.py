@@ -1,9 +1,7 @@
 # Default imports
 import os
-import zipfile
 import hashlib
 import logging
-import json
 from datetime import datetime
 from time import sleep
 
@@ -11,7 +9,6 @@ from time import sleep
 # Specific imports
 import requests
 import schedule
-import pandas as pd
 from argh import arg, dispatch_command
 
 #
@@ -149,6 +146,7 @@ def scraper(  # todo add missing args : zip_path report_path
         logging_file=None,
         zip_path="raw_data.zip",
         report_path="prices.csv"):
+
     logging.basicConfig(filename=logging_file,
                         level=logging.getLevelName(logging_level),
                         format='%(asctime)s | %(levelname)s | %(message)s')
@@ -167,7 +165,10 @@ def scraper(  # todo add missing args : zip_path report_path
     elif unit_time in ["h", "hours"]:
         job = job.hours
 
-    job.do(fetch_save_prices_data, data_folder=data_folder, zip_path=zip_path, report_path=report_path).run()
+    job.do(fetch_save_prices_data,
+           data_folder=data_folder,
+           zip_path=zip_path,
+           report_path=report_path).run()
 
     while True:
         try:
