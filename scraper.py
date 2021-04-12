@@ -142,14 +142,14 @@ def fetch_save_prices_data(data_folder, zip_path, report_path):
      help="zipfile file where a backup of the data will be stored")
 @arg("--report-file", "-rf",
      help="file to save the data in a smaller format")
-def scraper(  # todo add missing args : zip_path report_path
+def scraper(
         delta_time=DEFAULT_DELTA_TIME,
         unit_time=DEFAULT_UNIT_TIME,
         data_folder=DEFAULT_DATA_FOLDER,
         logging_level=DEFAULT_LOGGING_LEVEL,
         logging_file=None,
         zip_file="raw_data.zip",
-        report_file="prices.csv"):
+        report_file="raw_data.csv"):
 
     logging.basicConfig(filename=logging_file,
                         level=logging.getLevelName(logging_level),

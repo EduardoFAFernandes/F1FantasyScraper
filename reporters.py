@@ -73,7 +73,12 @@ def append_price_report(content, report_file):
         """
         starting_price = next(filter(lambda price: price["game_period_id"] == 70, asset["season_prices"]))["price"]
 
+        price_delta_race = round(float(asset["weekly_price_change"]), 1)
+        # some requests have sent this field as the team price instead of 0
+        if price_delta_race == starting_price:
+            price_delta_race = 0
 
+        # These initial percentages are not 100% certain, found it in f1 fantasy tracker discord
         INITIAL_PCT = {
             29 : 5,      # N. Mazepin
             26 : 15,     # K. Raikkonen
@@ -108,19 +113,19 @@ def append_price_report(content, report_file):
          }
         starting_selection_percentage = INITIAL_PCT[asset['id']]
 
-
         return {
             "id": int(asset['id']),
             "name": asset['display_name'],
             "price": float(asset['price']),
-            "price_delta": float(asset['price']) - float(starting_price),
+            "price_delta_start": round(float(asset['price']) - float(starting_price), 1),
+            "price_delta_race": price_delta_race,
             "probability_price_up_percentage": int(
                 asset['current_price_change_info']['probability_price_up_percentage']),
             "probability_price_down_percentage": int(
                 asset['current_price_change_info']['probability_price_down_percentage']),
             "current_selection_percentage": int(asset['current_price_change_info']["current_selection_percentage"]),
-            "current_selection_percentage_delta": int(
-                asset['current_price_change_info']["current_selection_percentage"]) - starting_selection_percentage
+            "current_selection_percentage_delta":
+                int(asset['current_price_change_info']["current_selection_percentage"]) - starting_selection_percentage
 
         }
 
