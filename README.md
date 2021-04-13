@@ -1,7 +1,7 @@
 # F1FantasyScraper
 The main focus of this project is to track f1 fantasy game.
 The scripts saves the responses of the f1 fantasy api.
-If you are interested in only the data visit ()[]
+If you are interested in only the data visit https://github.com/EduardoFAFernandes/F1FantasyData
 
 To run the project on your machine you will need to:
  - Install python 3
