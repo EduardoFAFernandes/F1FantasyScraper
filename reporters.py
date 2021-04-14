@@ -2,14 +2,15 @@ import zipfile
 import os
 import json
 import datetime
+from typing import Any, Dict, Union
 
-import pandas as pd
+import pandas as pd  # type: ignore
 
 
 _GEN_FILENAME_SUFIX = "f1Players"
 
 
-def _gen_filename(content):
+def _gen_filename(content: str) -> str:
     dt_srt = json.loads(content)["datetime"]
     if '.' not in dt_srt:
         dt_srt += '.0'
@@ -18,7 +19,7 @@ def _gen_filename(content):
            f"_{now.hour:02d}_{now.minute:02d}_{now.second:02d}.json"
 
 
-def save_to_local_dir(content, data_folder="."):
+def save_to_local_dir(content: str, data_folder: str = ".") -> str:
     """
     Saves the content to a json file in a given folder
 
@@ -38,7 +39,7 @@ def save_to_local_dir(content, data_folder="."):
     return file_path
 
 
-def save_to_local_zip(content, zip_path="zip.zip"):
+def save_to_local_zip(content: str, zip_path: str = "zip.zip") -> str:
     """
     Saves the content to a json file inside a zipfile generating a filename based on the date of the content
 
@@ -54,7 +55,7 @@ def save_to_local_zip(content, zip_path="zip.zip"):
     return filename
 
 
-def append_price_report(content, report_file):
+def append_price_report(content: str, report_file: str) -> None:
     """
     Extract relevant information from content and append it to a csv file
 
@@ -64,7 +65,7 @@ def append_price_report(content, report_file):
     :return: None
     """
 
-    def extract_asset_info(asset):
+    def extract_asset_info(asset: Any) -> Dict[str, Union[str, int]]:
         """
         Extracts relevant information for each asset
 
@@ -138,4 +139,3 @@ def append_price_report(content, report_file):
     report["datetime"] = data["datetime"]
 
     report.to_csv(report_file, mode='a', header=not os.path.isfile(report_file))
-

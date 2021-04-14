@@ -4,12 +4,12 @@ import hashlib
 import logging
 from datetime import datetime
 from time import sleep
-
+from typing import Optional
 
 # Specific imports
 import requests
-import schedule
-from argh import arg, dispatch_command
+import schedule  # type: ignore
+from argh import arg, dispatch_command  # type: ignore
 
 #
 import reporters
@@ -24,16 +24,15 @@ DEFAULT_DATA_FOLDER = "raw_data"
 DEFAULT_ZIP = DEFAULT_DATA_FOLDER + ".zip"
 DEFAULT_LOGGING_LEVEL = "INFO"
 
-
 # TODO remove global variables
-_static_previous_content_hash = None
+_static_previous_content_hash: Optional[str] = None
 _hash_file_path = "hash.txt"
 
 
-def get_previous_content_hash():
+def get_previous_content_hash() -> Optional[str]:
     """
-
-    :return:
+    Returns the hash of a previously saved file or None if no hash was saved
+    :return: the hash of a previously saved file
     """
     global _static_previous_content_hash
     global _hash_file_path
@@ -46,7 +45,7 @@ def get_previous_content_hash():
     return _static_previous_content_hash
 
 
-def set_previous_content_hash(previous_content_hash):
+def set_previous_content_hash(previous_content_hash: str) -> str:
     """
 
     :param previous_content_hash:
@@ -61,7 +60,7 @@ def set_previous_content_hash(previous_content_hash):
     return _static_previous_content_hash
 
 
-def request_prices_data(duplicates=False):
+def request_prices_data(duplicates: bool = False) -> Optional[str]:
     """
     Requests the latest prices from f1 fantasy api
 
@@ -84,7 +83,7 @@ def request_prices_data(duplicates=False):
 
     current_content_hash = hashlib.sha256(response.content).hexdigest()
     previous_content_hash = get_previous_content_hash()
-    if not duplicates\
+    if not duplicates \
             and previous_content_hash is not None \
             and previous_content_hash == current_content_hash:
         logging.info("Duplicated content.")
@@ -103,7 +102,7 @@ def request_prices_data(duplicates=False):
     return content
 
 
-def fetch_save_prices_data(data_folder, zip_path, report_path):
+def fetch_save_prices_data(data_folder: str, zip_path: str, report_path: str) -> None:
     """
     Fetches an updated prices from F1 fantasy saves the response in data_folder adds it to the zip in zip_path
     and finaly saves a resume in the report report_path
@@ -143,14 +142,13 @@ def fetch_save_prices_data(data_folder, zip_path, report_path):
 @arg("--report-file", "-rf",
      help="file to save the data in a smaller format")
 def scraper(
-        delta_time=DEFAULT_DELTA_TIME,
-        unit_time=DEFAULT_UNIT_TIME,
-        data_folder=DEFAULT_DATA_FOLDER,
-        logging_level=DEFAULT_LOGGING_LEVEL,
-        logging_file=None,
-        zip_file="raw_data.zip",
-        report_file="raw_data.csv"):
-
+        delta_time: int = DEFAULT_DELTA_TIME,
+        unit_time: str = DEFAULT_UNIT_TIME,
+        data_folder: str = DEFAULT_DATA_FOLDER,
+        logging_level: str = DEFAULT_LOGGING_LEVEL,
+        logging_file: Optional[str] = None,
+        zip_file: str = "raw_data.zip",
+        report_file: str = "raw_data.csv") -> None:
     logging.basicConfig(filename=logging_file,
                         level=logging.getLevelName(logging_level),
                         format='%(asctime)s | %(levelname)s | %(message)s')
