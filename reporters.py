@@ -19,7 +19,7 @@ def _gen_filename(content: str) -> str:
            f"_{now.hour:02d}_{now.minute:02d}_{now.second:02d}.json"
 
 
-def save_to_local_dir(content: str, data_folder: str = ".") -> str:
+def save_to_local_dir(content: str, data_folder: str) -> str:
     """
     Saves the content to a json file in a given folder
 
@@ -39,7 +39,7 @@ def save_to_local_dir(content: str, data_folder: str = ".") -> str:
     return file_path
 
 
-def save_to_local_zip(content: str, zip_path: str = "zip.zip") -> str:
+def save_to_local_zip(content: str, zip_path: str) -> str:
     """
     Saves the content to a json file inside a zipfile generating a filename based on the date of the content
 
