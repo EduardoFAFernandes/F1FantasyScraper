@@ -117,15 +117,18 @@ def append_price_report(content: str, report_file: str) -> None:
         return {
             "id": int(asset['id']),
             "name": asset['display_name'],
+
             "price": float(asset['price']),
-            "price_delta_start": round(float(asset['price']) - float(starting_price), 1),
+            "price_delta_season": round(float(asset['price']) - float(starting_price), 1),
             "price_delta_race": price_delta_race,
+
             "probability_price_up_percentage": int(
                 asset['current_price_change_info']['probability_price_up_percentage']),
             "probability_price_down_percentage": int(
                 asset['current_price_change_info']['probability_price_down_percentage']),
-            "current_selection_percentage": int(asset['current_price_change_info']["current_selection_percentage"]),
-            "current_selection_percentage_delta":
+
+            "selection_percentage": int(asset['current_price_change_info']["current_selection_percentage"]),
+            "selection_percentage_delta_season":
                 int(asset['current_price_change_info']["current_selection_percentage"]) - starting_selection_percentage
 
         }
