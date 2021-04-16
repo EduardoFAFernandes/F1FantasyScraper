@@ -2,10 +2,9 @@ import zipfile
 import os
 import json
 import datetime
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, Callable
 
 import pandas as pd  # type: ignore
-
 
 _GEN_FILENAME_SUFIX = "f1Players"
 
@@ -142,3 +141,24 @@ def append_price_report(content: str, report_file: str) -> None:
     report["datetime"] = data["datetime"]
 
     report.to_csv(report_file, mode='a', header=not os.path.isfile(report_file))
+
+
+def reprocess(raw_files_path: str, func: Callable[[str], Any]) -> None:
+
+    if os.path.isdir(raw_files_path):
+        for filename in sorted(os.listdir(raw_files_path)):
+            file_path = os.path.join(raw_files_path, filename)
+            with open(file_path, encoding="Windows-1252") as file:
+                func(file.read())
+
+    elif raw_files_path.endswith(".zip"):
+        if not os.path.isfile(raw_files_path):
+            raise FileNotFoundError
+
+        with zipfile.ZipFile("raw_data.csv") as zip_file:
+            for filename in sorted(zip_file.namelist()):
+                with zip_file.open(filename) as file:
+                    func(file.read().decode("Windows-1252"))
+
+    else:
+        raise NotADirectoryError
