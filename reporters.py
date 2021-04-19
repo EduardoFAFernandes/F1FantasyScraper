@@ -73,10 +73,12 @@ def append_price_report(content: str, report_file: str) -> None:
         """
         starting_price = next(filter(lambda price: price["game_period_id"] == 70, asset["season_prices"]))["price"]
 
-        price_delta_race = round(float(asset["weekly_price_change"]), 1)
+        price_delta_race = asset["weekly_price_change"]
         # some requests have sent this field as the team price instead of 0
-        if price_delta_race == starting_price:
+        if price_delta_race == asset['price']:
             price_delta_race = 0
+        price_delta_race = round(float(price_delta_race), 1)
+
 
         # These initial percentages are not 100% certain, found it in f1 fantasy tracker discord
         INITIAL_PCT = {
