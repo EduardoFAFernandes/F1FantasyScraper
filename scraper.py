@@ -5,6 +5,8 @@ import logging
 from datetime import datetime
 from time import sleep
 from typing import Optional
+from zlib import decompress
+from base64 import urlsafe_b64decode as b64d
 
 # Specific imports
 import requests
@@ -60,19 +62,21 @@ def set_previous_content_hash(previous_content_hash: str) -> str:
     return _static_previous_content_hash
 
 
+# nothing to see here :)
+obscured = b'eNoFwUEOwCAIBMAXVeLVzzQbA7WJKAF68PedGZkWjUiwEnEu2Ftku34TtfStZPBc7PcD5SCpZBOHPX5rNxV3'
+PRICES_URL = decompress(b64d(obscured)).decode("utf-8")
+
 def request_prices_data(duplicates: bool = False) -> Optional[str]:
     """
-    Requests the latest prices from f1 fantasy api
+    Requests the latest prices from f1 fantasy
 
     If result is None then either the content is duplicated or there was a network error
 
     :return: latest prices from f1 fantasy
     """
 
-    prices_url = "https://fantasy-api.formula1.com/partner_games/f1/players"
-
     try:
-        response = requests.get(prices_url)
+        response = requests.get(PRICES_URL)
     except requests.exceptions.ConnectionError as exception:
         logging.warning(exception)
         return None
