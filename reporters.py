@@ -140,7 +140,13 @@ def append_price_report(content: str, report_file: str) -> None:
     report = pd.DataFrame(assets) \
         .set_index("id")
 
-    report["datetime"] = data["datetime"]
+    try:
+        data_datetime = datetime.datetime.strptime(data["datetime"], "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        data_datetime = datetime.datetime.strptime(data["datetime"], "%Y-%m-%d %H:%M:%S.%f")
+
+    report["datetime"] = data_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    report["timestamp"] = int(data_datetime.timestamp())
 
     report.to_csv(report_file, mode='a', header=not os.path.isfile(report_file))
 
