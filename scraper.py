@@ -4,9 +4,10 @@ import hashlib
 import logging
 from datetime import datetime
 from time import sleep
-from typing import Optional
+from typing import Optional, Callable, List
 from zlib import decompress
 from base64 import urlsafe_b64decode as b64d
+from functools import partial
 
 # Specific imports
 import requests
@@ -17,14 +18,15 @@ from argh import arg, dispatch_command  # type: ignore
 import reporters
 
 # Constants
-DEV = True
 SLEEP_TIME = 60
 
 DEFAULT_DELTA_TIME = 10
 DEFAULT_UNIT_TIME = "minutes"
-DEFAULT_DATA_FOLDER = "raw_data"
-DEFAULT_ZIP = DEFAULT_DATA_FOLDER + ".zip"
 DEFAULT_LOGGING_LEVEL = "INFO"
+DEFAULT_REPORT_FILE = "raw_data.csv"
+DEFAULT_LOGGING_FILE = None
+DEFAULT_DATA_FOLDER = None
+DEFAULT_ZIP_FILE = None
 
 # TODO remove global variables
 _static_previous_content_hash: Optional[str] = None
@@ -106,7 +108,7 @@ def request_prices_data(duplicates: bool = False) -> Optional[str]:
     return content
 
 
-def fetch_save_prices_data(data_folder: str, zip_path: str, report_path: str) -> None:
+def fetch_do_reports(reporter_list: List[Callable[[str], any]]) -> None:
     """
     Fetches an updated prices from F1 fantasy saves the response in data_folder adds it to the zip in zip_path
     and finaly saves a resume in the report report_path
@@ -122,11 +124,8 @@ def fetch_save_prices_data(data_folder: str, zip_path: str, report_path: str) ->
     if content is None:
         return
 
-    reporters.append_price_report(content, report_file=report_path)
-
-    reporters.save_to_local_dir(content, data_folder=data_folder)
-
-    reporters.save_to_local_zip(content, zip_path=zip_path)
+    for reporter in reporter_list:
+        reporter(content)
 
 
 @arg("--delta-time", "-dt",
@@ -148,19 +147,29 @@ def fetch_save_prices_data(data_folder: str, zip_path: str, report_path: str) ->
 def scraper(
         delta_time: int = DEFAULT_DELTA_TIME,
         unit_time: str = DEFAULT_UNIT_TIME,
-        data_folder: str = DEFAULT_DATA_FOLDER,
+        data_folder: Optional[str] = DEFAULT_DATA_FOLDER,
         logging_level: str = DEFAULT_LOGGING_LEVEL,
-        logging_file: Optional[str] = None,
-        zip_file: str = "raw_data.zip",
-        report_file: str = "raw_data.csv") -> None:
+        logging_file: Optional[str] = DEFAULT_LOGGING_FILE,
+        zip_file: Optional[str] = DEFAULT_ZIP_FILE,
+        report_file: str = DEFAULT_REPORT_FILE) -> None:
+
     logging.basicConfig(filename=logging_file,
                         level=logging.getLevelName(logging_level),
                         format='%(asctime)s | %(levelname)s | %(message)s')
 
     logging.info("Starting scraper...")
 
-    if not os.path.isdir(data_folder):
-        os.mkdir(data_folder)
+    reporter_list = [partial(reporters.append_price_report, report_file=report_file)]
+
+    if data_folder is not None:
+
+        if not os.path.isdir(data_folder):
+            os.mkdir(data_folder)
+
+        reporter_list.append(partial(reporters.save_to_local_dir, data_folder=data_folder))
+
+    if zip_file is not None:
+        reporter_list.append(partial(reporters.save_to_local_zip, zip_path=zip_file))
 
     job = schedule.every(delta_time)
 
@@ -171,10 +180,7 @@ def scraper(
     elif unit_time in ["h", "hours"]:
         job = job.hours
 
-    job.do(fetch_save_prices_data,
-           data_folder=data_folder,
-           zip_path=zip_file,
-           report_path=report_file).run()
+    job.do(fetch_do_reports, reporter_list=reporter_list).run()
 
     while True:
         try:

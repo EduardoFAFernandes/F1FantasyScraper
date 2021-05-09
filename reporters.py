@@ -64,7 +64,7 @@ def append_price_report(content: str, report_file: str) -> None:
     :return: None
     """
 
-    def extract_asset_info(asset: Any) -> Dict[str, Union[str, int]]:
+    def extract_asset_info(asset: Any) -> Dict[str, Union[str, int, float]]:
         """
         Extracts relevant information for each asset
 
