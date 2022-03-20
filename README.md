@@ -1,5 +1,9 @@
 # F1FantasyScraper
 
+![](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![typechecking-and-linting](https://github.com/EduardoFAFernandes/F1FantasyScraper/actions/workflows/typecheking-and-linting.yaml/badge.svg)](https://github.com/EduardoFAFernandes/F1FantasyScraper/actions/workflows/typecheking-and-linting.yaml)
+
 The main focus of this project is to track F1 fantasy game prices.
 If you are interested in only the data visit 
 https://github.com/EduardoFAFernandes/F1FantasyData
