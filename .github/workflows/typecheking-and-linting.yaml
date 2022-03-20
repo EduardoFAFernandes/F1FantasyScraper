@@ -1,0 +1,26 @@
+name: typecheking-and-linting
+
+on:
+  push:
+
+jobs:
+  typecheking-and-linting:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+          cache: 'pip'
+            
+      - run: ls 
+
+      - run: pip install -r requierments-dev.txt
+      
+      - run: mypy --install-types --non-interactive
+
+      - run: pylint *.py
+
+      - run: python scraper.py

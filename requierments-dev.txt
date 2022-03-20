@@ -1,0 +1,6 @@
+argh
+pandas
+schedule
+requests
+pylint
+mypy
