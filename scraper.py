@@ -88,19 +88,18 @@ class Asset:
         :return: dictionary with the relevant asset information
         """
 
-        #This can and will blow up if the asset is in a different format
+        if asset['current_price_change_info'] is None:
+            raise Exception("Price change info unavailable.")
 
         self.asset_id = int(asset['id'])
         self.name = str(asset['display_name'])
         self.price = float(asset['price'])
-        self.sentiment = 0
-        self.selection_percentage = 0
-        # self.sentiment = int(asset['current_price_change_info']\
-        #                ['probability_price_up_percentage'])
-        #            - int(asset['current_price_change_info']\
-        #                ['probability_price_down_percentage']),
-        # self.selection_percentage = int(asset['current_price_change_info']\
-        #                            ["current_selection_percentage"]),
+        self.sentiment = int(asset['current_price_change_info']\
+                        ['probability_price_up_percentage'])\
+                        - int(asset['current_price_change_info']\
+                        ['probability_price_down_percentage'])
+        self.selection_percentage = int(asset['current_price_change_info']\
+                                ["current_selection_percentage"])
         self.date_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.timestamp = int(now.timestamp())
 
